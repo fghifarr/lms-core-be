@@ -26,3 +26,9 @@ logging:
   level:
     root: INFO
     com.ghifar.lms.core: DEBUG
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
