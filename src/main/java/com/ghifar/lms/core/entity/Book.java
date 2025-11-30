@@ -19,6 +19,9 @@ public class Book {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Version
+    private Long version = 0L;
+
     public enum Status {
 
         AVAILABLE, NOT_AVAILABLE, BORROWED

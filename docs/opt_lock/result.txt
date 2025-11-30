@@ -1,0 +1,19 @@
+In our case, there might be the case when multiple requests with the same bookId and different borrowerId try to hit the /core/loans/borrow-book
+This means, 2 users try to borrow the same book at the same time.
+If we're not handling this case properly, the loan might be issued twice for those multiple borrowers while it should not be.
+There are multiple options we can implement:
+1. Pessimistic Locking (DB)
+2. Distributed Locking (Redis)
+3. Optimistic Locking (DB)
+
+In this case, I choose Optimistic locking.
+I dont choose pessimistic locking because it prevent other transaction to access the row (explicitly lock the row)
+I also dont choose distributed locking because we need redis. Since we dont use it in this project, it is out.
+I choose optimistic locking because it doesn't lock the row.
+But we need to implement retry mechanism since it will throws pessimistic locking exception if the data got updated (basically version is different because previous transaction has successfully committed the data).
+
+How to test this case?
+To simply test this case, we can add sleep thread in the middle of the transaction. We need this sleep thread our process is really small, thus making the first transaction already committed while the second transaction has not fetched the book yet.
+After that, I simply create 2 tabs in postman to hit the same API (basically reproduce the case)
+With this, both transaction will fetch the same version and the second transaction will got exception because the new version has been committed by the first transaction.
+You can see the test evidence in docs/opt_lock/test_result_concurrent.png

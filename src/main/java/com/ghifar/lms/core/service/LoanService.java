@@ -10,10 +10,14 @@ import com.ghifar.lms.core.entity.Loan;
 import com.ghifar.lms.core.repository.BookRepository;
 import com.ghifar.lms.core.repository.BorrowerRepository;
 import com.ghifar.lms.core.repository.LoanRepository;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -27,8 +31,17 @@ public class LoanService {
     private final BookRepository bookRepository;
     private final BorrowerRepository borrowerRepository;
 
-    @Transactional
+    @Retryable(
+            includes = {ObjectOptimisticLockingFailureException.class, OptimisticLockException.class},
+            maxRetries = 4,
+            delay = 100,
+            jitter = 10,
+            multiplier = 2,
+            maxDelay = 1000
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public LoanResponse borrowBook(BorrowBookRequest request) {
+        log.info("borrowBook() with borrower: {}, book: {}", request.borrowerId(), request.bookId());
         Book book = bookRepository.findById(request.bookId()).orElseThrow(
                 () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find book with id : " + request.bookId())
         );
@@ -39,6 +52,14 @@ public class LoanService {
         Borrower borrower = borrowerRepository.findById(request.borrowerId()).orElseThrow(
                 () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find borrower with id : " + request.borrowerId())
         );
+
+        try {
+            log.info("start sleep to reproduce optimistic locking");
+            Thread.sleep(5000);
+            log.info("finish sleep");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         book.setStatus(Book.Status.BORROWED);
         bookRepository.save(book);
@@ -53,7 +74,15 @@ public class LoanService {
         return mapToBorrowBookResponse(book, borrower, loan);
     }
 
-    @Transactional
+    @Retryable(
+            includes = {ObjectOptimisticLockingFailureException.class, OptimisticLockException.class},
+            maxRetries = 4,
+            delay = 100,
+            jitter = 10,
+            multiplier = 2,
+            maxDelay = 1000
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public LoanResponse returnBook(ReturnBookRequest request) {
         Book book = bookRepository.findById(request.bookId()).orElseThrow(
                 () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find book with id : " + request.bookId())
