@@ -37,7 +37,7 @@ public class LoanService {
             throw new ValidationException(HttpStatus.BAD_REQUEST, "Book is not available. bookId: " + book.getId());
         }
         Borrower borrower = borrowerRepository.findById(request.borrowerId()).orElseThrow(
-                () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find borrower with id : " + book.getId())
+                () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find borrower with id : " + request.borrowerId())
         );
 
         book.setStatus(Book.Status.BORROWED);
@@ -63,7 +63,7 @@ public class LoanService {
             throw new ValidationException(HttpStatus.BAD_REQUEST, "Book is not borrowed. bookId: " + request.bookId());
         }
         Borrower returnee = borrowerRepository.findById(request.borrowerId()).orElseThrow(
-                () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find borrower with id : " + request.bookId())
+                () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find borrower with id : " + request.borrowerId())
         );
         Loan loan = loanRepository.findFirstByBookAndReturnedAtIsNull(book).orElseThrow(
                 () -> new ValidationException(HttpStatus.BAD_REQUEST, "Couldn't find active loan for book with id: " + book.getId())
