@@ -2,11 +2,13 @@ package com.ghifar.lms.core.config;
 
 import com.ghifar.lms.core.common.exception.ValidationException;
 import com.ghifar.lms.core.dto.ErrorResponse;
+import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,7 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        log.debug("handleMethodArgumentNotValidException() with exception: {}", ex.getMessage(), ex);
+        log.debug("handleMethodArgumentNotValidException() with exception: {}", ex.getMessage());
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -98,7 +100,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
-        log.debug("handleValidationException() with exception: {}", ex.getMessage(), ex);
+        log.debug("handleValidationException() with exception: {}", ex.getMessage());
         ErrorResponse resp = new ErrorResponse(
                 ex.getStatus().value(),
                 ex.getMessage(),
@@ -106,5 +108,29 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(ex.getStatus()).body(resp);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handleObjectOptimisticLockingFailureException(ObjectOptimisticLockingFailureException ex) {
+        log.warn("handleObjectOptimisticLockingFailureException() with exception: {}", ex.getMessage(), ex);
+        ErrorResponse resp = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Request conflicted, please try to again",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
+    }
+
+    @ExceptionHandler(OptimisticLockException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLockException(OptimisticLockException ex) {
+        log.warn("handleOptimisticLockException() with exception: {}", ex.getMessage(), ex);
+        ErrorResponse resp = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Request conflicted, please try to again",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
     }
 }

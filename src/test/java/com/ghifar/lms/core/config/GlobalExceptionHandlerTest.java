@@ -1,6 +1,7 @@
 package com.ghifar.lms.core.config;
 
 import com.ghifar.lms.core.dto.ErrorResponse;
+import jakarta.persistence.OptimisticLockException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -87,5 +89,27 @@ public class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("name cannot be null", response.getBody().message());
+    }
+
+    @Test
+    public void handleObjectOptimisticLockingFailureException_shouldReturnConflict() {
+        ObjectOptimisticLockingFailureException ex = new ObjectOptimisticLockingFailureException("Conflict", null);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleObjectOptimisticLockingFailureException(ex);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Request conflicted, please try to again", response.getBody().message());
+    }
+
+    @Test
+    public void handleOptimisticLockException_shouldReturnConflict() {
+        OptimisticLockException ex = new OptimisticLockException("Conflict", null);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleOptimisticLockException(ex);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Request conflicted, please try to again", response.getBody().message());
     }
 }

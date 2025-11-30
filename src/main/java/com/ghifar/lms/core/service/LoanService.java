@@ -53,14 +53,6 @@ public class LoanService {
                 () -> new ValidationException(HttpStatus.NOT_FOUND, "Couldn't find borrower with id : " + request.borrowerId())
         );
 
-        try {
-            log.info("start sleep to reproduce optimistic locking");
-            Thread.sleep(5000);
-            log.info("finish sleep");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
         book.setStatus(Book.Status.BORROWED);
         bookRepository.save(book);
 
