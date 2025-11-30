@@ -1,4 +1,4 @@
-package com.ghifar.lms_core_be;
+package com.ghifar.lms.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
