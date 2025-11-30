@@ -1,5 +1,6 @@
 package com.ghifar.lms.core.config;
 
+import com.ghifar.lms.core.common.exception.ValidationException;
 import com.ghifar.lms.core.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -93,5 +94,17 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(respStatus).body(resp);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
+        log.debug("handleValidationException() with exception: {}", ex.getMessage(), ex);
+        ErrorResponse resp = new ErrorResponse(
+                ex.getStatus().value(),
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(ex.getStatus()).body(resp);
     }
 }
