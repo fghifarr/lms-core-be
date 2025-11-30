@@ -1,0 +1,13 @@
+In our case, there's a loan scenario (borrow, return books).
+We need to handle this case properly.
+Thus, it's better to use DB that ACID compliance.
+That's why we're going to choose SQL rather than NoSQL.
+There are also many options for relational databases. Top 3, I would say PostgreSQL, MySQL, Oracle
+Oracle is well-known for enterprise but it has big cost. So, I will choose PostgreSQL or MySQL since they are open source n free to use
+Then the battle begins
+For me, personally, PostgreSQL is the better choice since:
+1. PostgreSQL use MVCC rather than locking mechanism for transaction isolation handling. This will result in better concurrent read/write performance
+2. PostgreSQL has JSONB type while MySQL has JSON. JSONB has better performance since it is in binary format and also has more operators
+3. PostgreSQL has built-in full text search. This might allow us to implement search book by title API.
+    This is really helpful for small-medium application since we dont really need to develop n deploy other service like elasticsearch
+Conclusion, PostgreSQL is the most suitable DB for library management system service with ACID compliance, better concurrent handling, and also its potential to handle future cases like search text
