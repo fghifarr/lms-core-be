@@ -61,6 +61,17 @@ environment:
 ## Project Structure
 This project use layered architecture, the most basic architecture that suitable for this small project  
 
+## Observability
+### Monitoring
+This project use Spring boot actuator. You can access the API here
+```angular2html
+curl --location 'http://localhost:8080/core/actuator' \
+--header 'accept: application/json' \
+--header 'Content-Type: application/json'
+```
+In our prod configuration, we override the exposed url to only health.  
+If we're using API gateway, we can enable the wildcard to expose all url so that we can access all actuator's APIs and exclude unwanted APIs to be exposed on public
+
 ## DB Migration
 The naming convention of the migration script file is V{incremental_number}__{script_name}.sql  
 You can add your script in
