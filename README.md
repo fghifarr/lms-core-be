@@ -88,7 +88,6 @@ See the logs below
 2025-12-01T16:02:53.866+07:00  INFO 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] c.ghifar.lms.core.service.LoanService    : borrowBook() with borrower: 4, book: 2
 2025-12-01T16:02:53.902+07:00  INFO 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] c.ghifar.lms.core.service.LoanService    : book is not available. book: 2, status: BORROWED
 2025-12-01T16:02:53.906+07:00 DEBUG 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] c.g.l.c.config.GlobalExceptionHandler    : handleValidationException() with exception: Book is not available. bookId: 2
-2025-12-01T16:02:53.921+07:00  WARN 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ghifar.lms.core.common.exception.ValidationException: Book is not available. bookId: 2]
 ```
 
 ## DB Migration

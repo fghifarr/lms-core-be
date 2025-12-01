@@ -26,6 +26,7 @@ logging:
   level:
     root: INFO
     com.ghifar.lms.core: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
 
 springdoc:
   api-docs:
