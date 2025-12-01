@@ -23,6 +23,12 @@ A simple library system built on top of spring boot
 docker compose up -d --build
 ```
 
+### Testing
+This project includes unit tests. You can run the test with this command 
+```
+./gradlew test
+```
+
 ### API Documentation
 This project use OpenAPI (Swagger) as API Documentation. You can check it here  
 http://localhost:8080/core/swagger-ui/index.html  
@@ -70,7 +76,20 @@ curl --location 'http://localhost:8080/core/actuator' \
 --header 'Content-Type: application/json'
 ```
 In our prod configuration, we override the exposed url to only health.  
-If we're using API gateway, we can enable the wildcard to expose all url so that we can access all actuator's APIs and exclude unwanted APIs to be exposed on public
+If we're using API gateway, we can enable the wildcard to expose all url so that we can access all actuator's APIs and exclude unwanted APIs to be exposed on public  
+### Logging
+This project implements opentelemetry tracing via micrometer to improve our logging.  
+With this, we attach trace ID and span ID to each logs. The trace ID will act as our correlation id.  
+By this implementation, we can easily trace and determine all logs related to a single request even when concurrent requests happening.  
+This definitely will boost our ability to debug our system flow in real production scenario.  
+
+See the logs below
+``` 
+2025-12-01T16:02:53.866+07:00  INFO 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] c.ghifar.lms.core.service.LoanService    : borrowBook() with borrower: 4, book: 2
+2025-12-01T16:02:53.902+07:00  INFO 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] c.ghifar.lms.core.service.LoanService    : book is not available. book: 2, status: BORROWED
+2025-12-01T16:02:53.906+07:00 DEBUG 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] c.g.l.c.config.GlobalExceptionHandler    : handleValidationException() with exception: Book is not available. bookId: 2
+2025-12-01T16:02:53.921+07:00  WARN 8986 --- [lms-core-be] [nio-8080-exec-2] [95a2777557b3f2065917e5039ad0ae95-d9bd039f7a9b3351] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ghifar.lms.core.common.exception.ValidationException: Book is not available. bookId: 2]
+```
 
 ## DB Migration
 The naming convention of the migration script file is V{incremental_number}__{script_name}.sql  

@@ -26,14 +26,26 @@ logging:
   level:
     root: INFO
     com.ghifar.lms.core: DEBUG
+
 springdoc:
   api-docs:
     enabled: true
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+  tracing:
+    export:
+      otlp:
+        enabled: false
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        enabled: false
